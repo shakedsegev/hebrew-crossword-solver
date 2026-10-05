@@ -223,10 +223,7 @@ def solve_endpoint(req: SolveRequest):
 
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = float(req.timeout_sec)
-    solver.parameters.num_workers = int(os.environ.get("SOLVER_WORKERS", 4))
-    solver.parameters.interleave_search = True
-    solver.parameters.cp_model_presolve = True
-    solver.parameters.linearization_level = 2
+    solver.parameters.num_workers = min(8, os.cpu_count() or 4)
 
     t0 = time.time()
     status = solver.Solve(model)
