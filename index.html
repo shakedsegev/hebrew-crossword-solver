@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>פותר תשבצי שלד והרכבה מתקדם</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-dark: #334155;
+      --black-cell: #1e293b;
+      --white-cell: #ffffff;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --highlight: #fef08a;
+      --highlight-border: #eab308;
+      --danger: #ef4444;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-family: 'Rubik', sans-serif;
+      font-size: 2.2rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      font-size: 1.1rem;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+      color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-secondary.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #1e293b;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    input[type="number"], textarea {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+
+    input[type="number"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      font-size: 0.95rem;
+    }
+
+    .toggle-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .toggle-hint {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-right: 1.8rem;
+    }
+
+    /* Interactive setup grid */
+    .grid-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 1rem 0;
+    }
+
+    .grid-info-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+      background: var(--bg);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-yellow { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+
+    .interactive-grid {
+      display: inline-grid;
+      border: 3px solid #1e293b;
+      background: #cbd5e1;
+      gap: 1px;
+      user-select: none;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    .interactive-cell {
+      width: 34px;
+      height: 34px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.1s;
+    }
+
+    .interactive-cell:hover {
+      background: #f1f5f9;
+    }
+
+    .interactive-cell.black {
+      background: var(--black-cell);
+    }
+
+    .interactive-cell.border-cell {
+      border: 1px dashed rgba(100, 116, 139, 0.4);
+    }
+
+    .interactive-cell .cell-coord {
+      font-size: 8px;
+      color: #94a3b8;
+      position: absolute;
+      top: 2px;
+      right: 2px;
+    }
+
+    .interactive-cell.black .cell-coord {
+      color: #475569;
+    }
+
+    .grid-tools {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Word pool tags preview */
+    .word-analysis {
+      margin-top: 1rem;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .word-analysis-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .word-tags-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .word-tag {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Solve button */
+    .btn-solve {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-solve:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-solve:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Results section */
+    #results-section {
+      display: none;
+      margin-top: 2rem;
+    }
+
+    .status-banner {
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .status-success {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+    }
+
+    .status-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .solution-layout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .solution-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Crossword result grid */
+    .crossword-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .crossword-table {
+      border-collapse: collapse;
+      direction: rtl;
+      border: 3px solid #0f172a;
+      box-shadow: var(--shadow-lg);
+      margin: 0 auto;
+    }
+
+    .crossword-cell {
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid #334155;
+      text-align: center;
+      position: relative;
+      font-weight: 800;
+      font-size: 1.45rem;
+      font-family: 'Assistant', sans-serif;
+      user-select: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    @media (max-width: 600px) {
+      .crossword-cell {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+      }
+    }
+
+    .crossword-cell.black {
+      background: #0f172a;
+      border-color: #0f172a;
+    }
+
+    .crossword-cell.white {
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .crossword-cell.highlighted {
+      background: #fef08a !important;
+      color: #854d0e !important;
+    }
+
+    .crossword-cell.highlighted-secondary {
+      background: #fed7aa !important;
+    }
+
+    .crossword-cell .cell-num {
+      position: absolute;
+      top: 1px;
+      right: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #64748b;
+      line-height: 1;
+    }
+
+    /* Placed words list */
+    .words-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .words-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .words-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .word-list-box {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .word-list-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.8rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .word-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .word-item:hover {
+      background: #f1f5f9;
+      transform: translateX(-2px);
+    }
+
+    .word-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .word-item-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .word-number {
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 22px;
+    }
+
+    .word-text {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .word-length {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .main-grid, header, .btn-solve, .top-actions, .grid-tools {
+        display: none !important;
+      }
+      #results-section {
+        display: block !important;
+      }
+      .card, .crossword-container {
+        box-shadow: none;
+        border: none;
+      }
+      .crossword-table {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🧩 פותר תשבצי שלד והרכבה</h1>
+    <p>פתרון דטרמיניסטי מדויק באמצעות תכנות אילוצים (CP-SAT Solver)</p>
+    <div class="top-actions">
+      <button class="btn-secondary" onclick="loadExamplePuzzle()">
+        <span>🎯</span> טען את תשבץ הדוגמה (10x11 עם 42 מילים)
+      </button>
+      <button class="btn-secondary" onclick="resetForm()">
+        <span>🔄</span> אפס נתונים
+      </button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Right side (in RTL): Board parameters & Interactive Grid -->
+    <div class="card">
+      <div class="card-title">
+        <span>📐 הגדרות הלוח ומשבצות שחורות</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rows">שורות (גובה)</label>
+          <input type="number" id="rows" value="10" min="3" max="15" onchange="updateGridDimensions()">
+        </div>
+        <div class="form-group">
+          <label for="cols">עמודות (רוחב)</label>
+          <input type="number" id="cols" value="11" min="3" max="15" onchange="updateGridDimensions()">
+        </div>
+        <div class="form-group">
+          <label for="totalBlacks">סה״כ שחורות</label>
+          <input type="number" id="totalBlacks" value="25" min="0" onchange="updateGridInfo()">
+        </div>
+      </div>
+
+      <div class="grid-wrapper">
+        <div class="grid-info-bar">
+          <div>
+            <span>שחורות מסומנות: </span>
+            <span class="badge badge-blue" id="selectedBlacksBadge">0 / 25</span>
+          </div>
+          <div>
+            <span>נותרו לאלגוריתם: </span>
+            <span class="badge badge-green" id="remainingBlacksBadge">25</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-align: center;">
+          לחץ וגרור כדי לסמן משבצות שחורות ידועות (מסגרת מקווקוות מציינת את גבולות הלוח)
+        </p>
+
+        <div id="setupGrid" class="interactive-grid"></div>
+
+        <div class="grid-tools">
+          <button class="btn-secondary" type="button" onclick="clearSelectedBlacks()">נקה שחורות</button>
+          <button class="btn-secondary" type="button" onclick="invertBlacks()">הפוך סימון</button>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="strictBorders" checked>
+          <span>אכוף את "חוק המסגרת" (Strict Borders)</span>
+        </label>
+        <div class="toggle-hint">
+          מונע מהאלגוריתם להוסיף משבצות שחורות על גבי המסגרת מעבר לאלו שסומנו.
+        </div>
+
+        <label class="toggle-label" style="margin-top: 0.4rem;">
+          <input type="checkbox" id="smartFinalLetters" checked>
+          <span>הצג אותיות סופיות חכמות (ם, ן, ץ, ף, ך) בסיומות מילים</span>
+        </label>
+
+        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border);">
+          <label for="backendUrl" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">
+            כתובת שרת API (אם פרוס בענן כגון Render / Railway, השאר ריק אם מריץ מקומית או עם Netlify Proxy):
+          </label>
+          <input type="text" id="backendUrl" placeholder="לדוגמה: https://my-crossword.onrender.com" style="font-size: 0.85rem; padding: 0.4rem 0.6rem; width: 100%; border: 1px solid var(--border); border-radius: 6px;" onchange="localStorage.setItem('crossword_backend_url', this.value.trim())">
+        </div>
+      </div>
+    </div>
+
+    <!-- Left side (in RTL): Word pool & Validation -->
+    <div class="card">
+      <div class="card-title">
+        <span>📝 מאגר המילים לשיבוץ</span>
+        <span class="badge badge-blue" id="wordsCountBadge">0 מילים</span>
+      </div>
+
+      <div class="form-group">
+        <label for="rawWords">הדבק או הקלד מילים (מופרדות בפסיקים, רווחים, שורות או קטגוריות אורך):</label>
+        <textarea id="rawWords" placeholder="לדוגמה:
+2 אותיות: בי, דף, הל, טו, לס, נר, קח
+3 אותיות: בזר, גוף, הבל, ודל, זרע...
+או פשוט רשימת מילים חופשית..." oninput="handleWordsInput()"></textarea>
+      </div>
+
+      <div class="word-analysis" id="wordAnalysisBox">
+        <div class="word-analysis-header">
+          <span>ניתוח מאגר המילים</span>
+          <span id="analysisLettersCount">0 אותיות</span>
+        </div>
+        <div id="wordLengthCategories"></div>
+      </div>
+
+      <button class="btn-solve" id="solveBtn" onclick="runSolver()">
+        <span class="spinner" id="btnSpinner"></span>
+        <span id="btnText">🚀 פתור את התשבץ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div id="results-section">
+    <div id="statusBanner" class="status-banner"></div>
+
+    <div class="solution-layout">
+      <!-- Crossword Board -->
+      <div class="crossword-container">
+        <h3 style="margin-bottom: 1rem; color: #1e293b;">לוח התשבץ הפתור (מימין לשמאל)</h3>
+        <div id="crosswordBoard"></div>
+
+        <div style="display: flex; gap: 0.8rem; margin-top: 1.5rem;">
+          <button class="btn-secondary" onclick="copySolutionText()">📋 העתק כטקסט</button>
+          <button class="btn-secondary" onclick="window.print()">🖨️ הדפס / שמור כ-PDF</button>
+        </div>
+      </div>
+
+      <!-- Placed Words List -->
+      <div class="words-breakdown">
+        <div class="card">
+          <div class="card-title">
+            <span>📖 שיבוץ המילים בלוח</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: normal;">רחף מעל מילה להדגשה בלוח</span>
+          </div>
+          <div class="words-columns">
+            <div class="word-list-box">
+              <div class="word-list-title">
+                <span>מאוזן (Horizontal)</span>
+                <span class="badge badge-blue" id="acrossCountBadge">0</span>
+              </div>
+              <div id="acrossList"></div>
+            </div>
+
+            <div class="word-list-box">
+              <div class="word-list-title">
+                <span>מאונך (Vertical)</span>
+                <span class="badge badge-green" id="downCountBadge">0</span>
+              </div>
+              <div id="downList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedBlacks = new Set();
+  let isMouseDown = false;
+  let paintMode = true; // true for painting black, false for clearing
+  let lastSolutionData = null;
+
+  // Preset sample puzzle from conversation
+  const SAMPLE_PUZZLE = {
+    rows: 10,
+    cols: 11,
+    totalBlacks: 25,
+    fixedBlacks: [
+      [0, 5],
+      [3, 0], [3, 10],
+      [6, 0], [6, 10],
+      [9, 2], [9, 8]
+    ],
+    words: `2 אותיות: בי, דף, הל, ט"ו, לס, נר, קח.
+3 אותיות: בזר, גוף, הבל, ודל, זרע, יוה, יער, לוב, מזה, מרן, נסק, קרן, רבה, רהב, רצד, שצף.
+4 אותיות: טופח, מרבה, מרבי, סעוד, רועש.
+5 אותיות: בהמות, בצבוץ, גברתן, האנוי, הכרמל, הכתבה, הרעיד, כרכוך, מכינה, נמנמה, ספלון, קממבר.
+6 אותיות: האוזנר, נודיזם.`
+  };
+
+  function init() {
+    document.addEventListener('mouseup', () => { isMouseDown = false; });
+    const savedBackend = localStorage.getItem('crossword_backend_url');
+    if (savedBackend) {
+      document.getElementById('backendUrl').value = savedBackend;
+    }
+    loadExamplePuzzle();
+  }
+
+  function loadExamplePuzzle() {
+    document.getElementById('rows').value = SAMPLE_PUZZLE.rows;
+    document.getElementById('cols').value = SAMPLE_PUZZLE.cols;
+    document.getElementById('totalBlacks').value = SAMPLE_PUZZLE.totalBlacks;
+    document.getElementById('rawWords').value = SAMPLE_PUZZLE.words;
+    document.getElementById('strictBorders').checked = true;
+
+    selectedBlacks.clear();
+    for (const [r, c] of SAMPLE_PUZZLE.fixedBlacks) {
+      selectedBlacks.add(`${r},${c}`);
+    }
+
+    renderSetupGrid();
+    handleWordsInput();
+    updateGridInfo();
+  }
+
+  function resetForm() {
+    document.getElementById('rows').value = 10;
+    document.getElementById('cols').value = 11;
+    document.getElementById('totalBlacks').value = 25;
+    document.getElementById('rawWords').value = '';
+    selectedBlacks.clear();
+    renderSetupGrid();
+    handleWordsInput();
+    updateGridInfo();
+    document.getElementById('results-section').style.display = 'none';
+  }
+
+  function updateGridDimensions() {
+    let rows = parseInt(document.getElementById('rows').value) || 10;
+    let cols = parseInt(document.getElementById('cols').value) || 11;
+    rows = Math.max(3, Math.min(15, rows));
+    cols = Math.max(3, Math.min(15, cols));
+    document.getElementById('rows').value = rows;
+    document.getElementById('cols').value = cols;
+
+    // Prune out-of-bounds selected blacks
+    const pruned = new Set();
+    for (const item of selectedBlacks) {
+      const [r, c] = item.split(',').map(Number);
+      if (r < rows && c < cols) {
+        pruned.add(item);
+      }
+    }
+    selectedBlacks = pruned;
+
+    renderSetupGrid();
+    updateGridInfo();
+    handleWordsInput();
+  }
+
+  function renderSetupGrid() {
+    const rows = parseInt(document.getElementById('rows').value);
+    const cols = parseInt(document.getElementById('cols').value);
+    const gridEl = document.getElementById('setupGrid');
+
+    gridEl.style.gridTemplateColumns = `repeat(${cols}, 34px)`;
+    gridEl.innerHTML = '';
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'interactive-cell';
+        const isBorder = (r === 0 || r === rows - 1 || c === 0 || c === cols - 1);
+        if (isBorder) cell.classList.add('border-cell');
+
+        const key = `${r},${c}`;
+        if (selectedBlacks.has(key)) cell.classList.add('black');
+
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+
+        cell.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          isMouseDown = true;
+          paintMode = !selectedBlacks.has(key);
+          toggleCell(cell, r, c, paintMode);
+        });
+
+        cell.addEventListener('mouseenter', () => {
+          if (isMouseDown) {
+            toggleCell(cell, r, c, paintMode);
+          }
+        });
+
+        gridEl.appendChild(cell);
+      }
+    }
+  }
+
+  function toggleCell(cell, r, c, setBlack) {
+    const key = `${r},${c}`;
+    if (setBlack) {
+      selectedBlacks.add(key);
+      cell.classList.add('black');
+    } else {
+      selectedBlacks.delete(key);
+      cell.classList.remove('black');
+    }
+    updateGridInfo();
+  }
+
+  function clearSelectedBlacks() {
+    selectedBlacks.clear();
+    const cells = document.querySelectorAll('.interactive-cell');
+    cells.forEach(c => c.classList.remove('black'));
+    updateGridInfo();
+  }
+
+  function invertBlacks() {
+    const rows = parseInt(document.getElementById('rows').value);
+    const cols = parseInt(document.getElementById('cols').value);
+    const cells = document.querySelectorAll('.interactive-cell');
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const key = `${r},${c}`;
+        if (selectedBlacks.has(key)) {
+          selectedBlacks.delete(key);
+        } else {
+          selectedBlacks.add(key);
+        }
+      }
+    }
+    renderSetupGrid();
+    updateGridInfo();
+  }
+
+  function updateGridInfo() {
+    const totalBlacks = parseInt(document.getElementById('totalBlacks').value) || 0;
+    const selectedCount = selectedBlacks.size;
+    const remaining = totalBlacks - selectedCount;
+
+    const selectedBadge = document.getElementById('selectedBlacksBadge');
+    selectedBadge.innerText = `${selectedCount} / ${totalBlacks}`;
+    if (selectedCount > totalBlacks) {
+      selectedBadge.className = 'badge badge-red';
+    } else {
+      selectedBadge.className = 'badge badge-blue';
+    }
+
+    const remainingBadge = document.getElementById('remainingBlacksBadge');
+    remainingBadge.innerText = remaining >= 0 ? remaining : 'חריגה!';
+    remainingBadge.className = remaining >= 0 ? 'badge badge-green' : 'badge badge-red';
+  }
+
+  // Client-side quick word parsing & breakdown
+  function parseWordsFromText(text) {
+    const lines = text.split('\n');
+    const cleanedLines = lines.map(line => {
+      return line.replace(/^\s*\d*\s*(?:מילים\s+בנות\s+)?(?:\d+\s+)?(?:אותיות|אות|אותיות:)\s*[:-]?\s*/i, '')
+                 .replace(/\(\s*\d+\s*אותיות\s*\)/g, '');
+    });
+    const fullText = cleanedLines.join('\n');
+    const tokens = fullText.split(/[\n\r,;\t ]+/);
+    const words = [];
+    for (const t of tokens) {
+      const cleaned = t.replace(/[^א-ת]/g, '');
+      if (['אותיות', 'אות', 'מילים', 'מילה', 'ערכים'].includes(cleaned)) continue;
+      if (cleaned.length >= 2) words.push(cleaned);
+    }
+    return words;
+  }
+
+  function handleWordsInput() {
+    const raw = document.getElementById('rawWords').value;
+    const words = parseWordsFromText(raw);
+    const rows = parseInt(document.getElementById('rows').value) || 10;
+    const cols = parseInt(document.getElementById('cols').value) || 11;
+    const maxDim = Math.max(rows, cols);
+
+    document.getElementById('wordsCountBadge').innerText = `${words.length} מילים`;
+
+    const byLen = {};
+    let totalLetters = 0;
+    let oversizeWords = [];
+
+    for (const w of words) {
+      totalLetters += w.length;
+      byLen[w.length] = byLen[w.length] || [];
+      byLen[w.length].push(w);
+      if (w.length > maxDim) {
+        oversizeWords.push(w);
+      }
+    }
+
+    document.getElementById('analysisLettersCount').innerText = `${totalLetters} אותיות סה״כ`;
+
+    const container = document.getElementById('wordLengthCategories');
+    container.innerHTML = '';
+
+    if (oversizeWords.length > 0) {
+      const alertDiv = document.createElement('div');
+      alertDiv.style.color = '#dc2626';
+      alertDiv.style.fontWeight = 'bold';
+      alertDiv.style.marginBottom = '0.5rem';
+      alertDiv.innerText = `⚠️ המילים הבאות חורגות מממדי הלוח (${maxDim}): ${oversizeWords.join(', ')}`;
+      container.appendChild(alertDiv);
+    }
+
+    const sortedLens = Object.keys(byLen).map(Number).sort((a,b) => a - b);
+    for (const len of sortedLens) {
+      const groupDiv = document.createElement('div');
+      groupDiv.style.marginTop = '0.4rem';
+      groupDiv.innerHTML = `<strong>${len} אותיות (${byLen[len].length}):</strong>`;
+
+      const tagsDiv = document.createElement('div');
+      tagsDiv.className = 'word-tags-group';
+      for (const w of byLen[len]) {
+        const tag = document.createElement('span');
+        tag.className = 'word-tag';
+        tag.innerText = w;
+        tagsDiv.appendChild(tag);
+      }
+      groupDiv.appendChild(tagsDiv);
+      container.appendChild(groupDiv);
+    }
+  }
+
+  async function runSolver() {
+    const rows = parseInt(document.getElementById('rows').value);
+    const cols = parseInt(document.getElementById('cols').value);
+    const totalBlacks = parseInt(document.getElementById('totalBlacks').value);
+    const rawWords = document.getElementById('rawWords').value;
+    const strictBorders = document.getElementById('strictBorders').checked;
+    const smartFinalLetters = document.getElementById('smartFinalLetters').checked;
+
+    const fixedBlacksArray = Array.from(selectedBlacks).map(str => str.split(',').map(Number));
+
+    const solveBtn = document.getElementById('solveBtn');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnText = document.getElementById('btnText');
+    const resultsSection = document.getElementById('results-section');
+    const statusBanner = document.getElementById('statusBanner');
+
+    solveBtn.disabled = true;
+    btnSpinner.style.display = 'inline-block';
+    btnText.innerText = 'מחשב פתרון באמצעות פותרן אילוצים...';
+    resultsSection.style.display = 'none';
+
+    try {
+      let baseUrl = (document.getElementById('backendUrl').value || '').trim();
+      if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+      const endpoint = baseUrl ? `${baseUrl}/api/solve` : '/api/solve';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rows: rows,
+          cols: cols,
+          total_blacks: totalBlacks,
+          fixed_blacks: fixedBlacksArray,
+          raw_words: rawWords,
+          strict_borders: strictBorders,
+          smart_final_letters: smartFinalLetters,
+          timeout_sec: 180.0
+        })
+      });
+
+      const data = await res.json();
+
+      resultsSection.style.display = 'block';
+
+      if (!res.ok || data.status === 'failure') {
+        const errMsg = data.detail || data.message || 'שגיאה בחישוב הפתרון.';
+        statusBanner.className = 'status-banner status-error';
+        statusBanner.innerHTML = `<span>❌ ${errMsg}</span>`;
+        document.getElementById('crosswordBoard').innerHTML = '';
+        document.getElementById('acrossList').innerHTML = '';
+        document.getElementById('downList').innerHTML = '';
+      } else {
+        lastSolutionData = data;
+        statusBanner.className = 'status-banner status-success';
+        statusBanner.innerHTML = `
+          <span>✅ נמצא פתרון מושלם וחוקי!</span>
+          <span>זמן חישוב: <strong>${data.solve_time_sec} שניות</strong> | סה״כ מילים: <strong>${data.stats.total_words}</strong> (${data.stats.across_count} מאוזן, ${data.stats.down_count} מאונך)</span>
+        `;
+        renderCrossword(data);
+        renderPlacedWords(data.placed_words);
+      }
+    } catch (err) {
+      resultsSection.style.display = 'block';
+      statusBanner.className = 'status-banner status-error';
+      statusBanner.innerHTML = `<span>❌ שגיאת תקשורת עם השרת: ${err.message}. ודא ששרת הפייתון פועל.</span>`;
+    } finally {
+      solveBtn.disabled = false;
+      btnSpinner.style.display = 'none';
+      btnText.innerText = '🚀 פתור את התשבץ';
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function renderCrossword(data) {
+    const container = document.getElementById('crosswordBoard');
+    const table = document.createElement('table');
+    table.className = 'crossword-table';
+
+    for (let r = 0; r < data.rows; r++) {
+      const tr = document.createElement('tr');
+      for (let c = 0; c < data.cols; c++) {
+        const cellData = data.grid[r][c];
+        const td = document.createElement('td');
+        td.className = 'crossword-cell ' + (cellData.is_black ? 'black' : 'white');
+        td.dataset.r = r;
+        td.dataset.c = c;
+
+        if (!cellData.is_black) {
+          if (cellData.clue_number) {
+            const numSpan = document.createElement('span');
+            numSpan.className = 'cell-num';
+            numSpan.innerText = cellData.clue_number;
+            td.appendChild(numSpan);
+          }
+          const charSpan = document.createElement('span');
+          charSpan.innerText = cellData.letter_display || cellData.letter;
+          td.appendChild(charSpan);
+
+          // Clicking a cell highlights its crossing words
+          td.addEventListener('click', () => {
+            highlightCellWords(r, c);
+          });
+        }
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    container.innerHTML = '';
+    container.appendChild(table);
+  }
+
+  function renderPlacedWords(placedWords) {
+    const acrossList = document.getElementById('acrossList');
+    const downList = document.getElementById('downList');
+    acrossList.innerHTML = '';
+    downList.innerHTML = '';
+
+    const acrossWords = placedWords.filter(w => w.direction === 'H');
+    const downWords = placedWords.filter(w => w.direction === 'V');
+
+    document.getElementById('acrossCountBadge').innerText = acrossWords.length;
+    document.getElementById('downCountBadge').innerText = downWords.length;
+
+    function createWordItem(pw) {
+      const div = document.createElement('div');
+      div.className = 'word-item';
+      div.dataset.id = pw.id;
+      div.innerHTML = `
+        <div class="word-item-info">
+          <span class="word-number">${pw.clue_number || ''}.</span>
+          <span class="word-text">${pw.word}</span>
+        </div>
+        <span class="word-length">(${pw.len})</span>
+      `;
+
+      div.addEventListener('mouseenter', () => highlightWord(pw, true));
+      div.addEventListener('mouseleave', () => highlightWord(pw, false));
+      return div;
+    }
+
+    acrossWords.forEach(w => acrossList.appendChild(createWordItem(w)));
+    downWords.forEach(w => downList.appendChild(createWordItem(w)));
+  }
+
+  function highlightWord(pw, active) {
+    const cells = document.querySelectorAll('.crossword-cell');
+    if (!active) {
+      cells.forEach(c => c.classList.remove('highlighted', 'highlighted-secondary'));
+      return;
+    }
+
+    for (let d = 0; d < pw.len; d++) {
+      const r = pw.direction === 'H' ? pw.r : pw.r + d;
+      const c = pw.direction === 'H' ? pw.c + d : pw.c;
+      const cell = document.querySelector(`.crossword-cell[data-r="${r}"][data-c="${c}"]`);
+      if (cell) cell.classList.add('highlighted');
+    }
+  }
+
+  function highlightCellWords(r, c) {
+    if (!lastSolutionData) return;
+    const matchingWords = lastSolutionData.placed_words.filter(pw => {
+      if (pw.direction === 'H') {
+        return pw.r === r && pw.c <= c && c < pw.c + pw.len;
+      } else {
+        return pw.c === c && pw.r <= r && r < pw.r + pw.len;
+      }
+    });
+
+    const cells = document.querySelectorAll('.crossword-cell');
+    cells.forEach(c => c.classList.remove('highlighted', 'highlighted-secondary'));
+
+    matchingWords.forEach((pw, idx) => {
+      for (let d = 0; d < pw.len; d++) {
+        const wr = pw.direction === 'H' ? pw.r : pw.r + d;
+        const wc = pw.direction === 'H' ? pw.c + d : pw.c;
+        const cell = document.querySelector(`.crossword-cell[data-r="${wr}"][data-c="${wc}"]`);
+        if (cell) {
+          if (idx === 0) cell.classList.add('highlighted');
+          else cell.classList.add('highlighted-secondary');
+        }
+      }
+    });
+  }
+
+  function copySolutionText() {
+    if (!lastSolutionData) return;
+    let text = `תשבץ שלד פתור (${lastSolutionData.rows}x${lastSolutionData.cols}):\n\n`;
+    for (let r = 0; r < lastSolutionData.rows; r++) {
+      const rowChars = [];
+      for (let c = 0; c < lastSolutionData.cols; c++) {
+        const cell = lastSolutionData.grid[r][c];
+        if (cell.is_black) rowChars.push('⬛');
+        else rowChars.push(cell.letter_display || cell.letter);
+      }
+      text += rowChars.join(' ') + '\n';
+    }
+
+    text += '\nשיבוץ מילים מאוזן:\n';
+    lastSolutionData.placed_words.filter(w => w.direction === 'H').forEach(w => {
+      text += `${w.clue_number}. ${w.word} (${w.len})\n`;
+    });
+
+    text += '\nשיבוץ מילים מאונך:\n';
+    lastSolutionData.placed_words.filter(w => w.direction === 'V').forEach(w => {
+      text += `${w.clue_number}. ${w.word} (${w.len})\n`;
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+      alert('הפתרון הועתק ללוח בהצלחה!');
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
