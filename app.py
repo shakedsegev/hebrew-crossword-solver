@@ -362,6 +362,17 @@ def solve_endpoint(req: SolveRequest):
         }
     }
 
+try:
+    if "SPACE_ID" in os.environ:
+        import gradio as gr
+        with gr.Blocks(title="Hebrew Crossword Solver") as gradio_ui:
+            gr.Markdown("# 🧩 Hebrew Crossword Solver API is Running\nFrontend: [https://hebrew-crossword-solver.netlify.app](https://hebrew-crossword-solver.netlify.app)")
+        app = gr.mount_gradio_app(app, gradio_ui, path="/gradio")
+except Exception:
+    pass
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 7860 if "SPACE_ID" in os.environ else 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
