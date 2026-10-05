@@ -787,8 +787,11 @@
   function init() {
     document.addEventListener('mouseup', () => { isMouseDown = false; });
     const savedBackend = localStorage.getItem('crossword_backend_url');
-    if (savedBackend) {
+    if (savedBackend && !savedBackend.includes('loca.lt')) {
       document.getElementById('backendUrl').value = savedBackend;
+    } else {
+      localStorage.removeItem('crossword_backend_url');
+      document.getElementById('backendUrl').value = '';
     }
     loadExamplePuzzle();
   }
@@ -1054,7 +1057,12 @@
         })
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error(`שרת ה-API החזיר תשובה שאינה JSON (סטטוס ${res.status}). אם השרת הרגע התעורר, אנא לחץ שוב על פתור.`);
+      }
 
       resultsSection.style.display = 'block';
 
