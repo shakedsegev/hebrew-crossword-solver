@@ -677,9 +677,9 @@
 
         <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border);">
           <label for="backendUrl" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">
-            כתובת שרת API (אם פרוס בענן כגון Render / Railway, השאר ריק אם מריץ מקומית או עם Netlify Proxy):
+            כתובת שרת API (Render):
           </label>
-          <input type="text" id="backendUrl" placeholder="לדוגמה: https://my-crossword.onrender.com" style="font-size: 0.85rem; padding: 0.4rem 0.6rem; width: 100%; border: 1px solid var(--border); border-radius: 6px;" onchange="localStorage.setItem('crossword_backend_url', this.value.trim())">
+          <input type="text" id="backendUrl" value="https://hebrew-crossword-solver-meqs.onrender.com" placeholder="https://hebrew-crossword-solver-meqs.onrender.com" style="font-size: 0.85rem; padding: 0.4rem 0.6rem; width: 100%; border: 1px solid var(--border); border-radius: 6px;" onchange="localStorage.setItem('crossword_backend_url', this.value.trim())">
         </div>
       </div>
     </div>
@@ -787,11 +787,11 @@
   function init() {
     document.addEventListener('mouseup', () => { isMouseDown = false; });
     const savedBackend = localStorage.getItem('crossword_backend_url');
-    if (savedBackend && !savedBackend.includes('loca.lt')) {
+    if (savedBackend && !savedBackend.includes('loca.lt') && !savedBackend.includes('localhost')) {
       document.getElementById('backendUrl').value = savedBackend;
     } else {
       localStorage.removeItem('crossword_backend_url');
-      document.getElementById('backendUrl').value = '';
+      document.getElementById('backendUrl').value = 'https://hebrew-crossword-solver-meqs.onrender.com';
     }
     loadExamplePuzzle();
   }
@@ -1038,9 +1038,10 @@
     resultsSection.style.display = 'none';
 
     try {
-      let baseUrl = (document.getElementById('backendUrl').value || '').trim();
+      const DEFAULT_API = "https://hebrew-crossword-solver-meqs.onrender.com";
+      let baseUrl = (document.getElementById('backendUrl').value || '').trim() || DEFAULT_API;
       if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
-      const endpoint = baseUrl ? `${baseUrl}/api/solve` : '/api/solve';
+      const endpoint = `${baseUrl}/api/solve`;
 
       const res = await fetch(endpoint, {
         method: 'POST',
